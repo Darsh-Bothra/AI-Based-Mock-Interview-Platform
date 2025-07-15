@@ -1,7 +1,5 @@
-// 'use client';
 
 import AuthCard from '@/components/AuthForm'
-import React from 'react'
 
 const SignUp = () => {
   return (

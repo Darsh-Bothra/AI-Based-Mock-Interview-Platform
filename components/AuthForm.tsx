@@ -13,6 +13,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { signIn, signUp } from "@/lib/action/auth.action";
+import { auth } from "@/firebase/client";
 
 const authSchema = z.object({
     fullName: z.string().min(2, "Full name is required").optional(),
@@ -36,19 +39,39 @@ export default function AuthCard({ type }: AuthCardProps) {
         resolver: zodResolver(authSchema),
     });
 
-    const onSubmit = (data: AuthFormType) => {
+    const onSubmit = async (data: AuthFormType) => {
         console.log("Form submitted", data);
         try {
-            if(type === "sign-up") {
+            if (type === "sign-up") {
+                const { fullName, email, password } = data;
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const res = await signUp({
+                    uid: userCredential.user.uid,
+                    name: fullName!,
+                    email,
+                    password
+                })
+                if(!res.success) {
+                    toast.error(res.message)
+                    return
+                } 
                 toast.success("Account created successfully! Sign in to continue");
                 router.push("/sign-in")
             }
-            else if(type === "sign-in") {
+            else if (type === "sign-in") {
+                const {email, password} = data;
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const idToken = await userCredential.user.getIdToken();
+                if(!idToken) {
+                    toast.error("Something went wrong")
+                    return
+                }
+                await signIn({email, idToken});
                 toast.success("Signed In successfully");
                 router.push("/")
             }
         }
-        catch(err) {
+        catch (err) {
             console.log(err);
             toast.error(`There was an: ${err}`);
         }
