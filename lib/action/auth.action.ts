@@ -102,6 +102,7 @@ export async function getCurrentUser(): Promise<User | null> {
 
 }
 
+// TODO : Home page and interview button authentication
 export async function isAuthenticated() {
     const user = await getCurrentUser();
     return !!user;

@@ -4,6 +4,10 @@ import Link from 'next/link';
 import { dummyInterviews } from '@/constants';
 import InterviewCard from '@/components/InterviewCard';
 import { TypewriterEffect } from '@/components/ui/typewriter-effect';
+import { isAuthenticated } from '@/lib/action/auth.action';
+import Modal from '@/components/Modal';
+import { useState } from 'react';
+import { ActionBtn } from '@/components/ActionBtn';
 
 const Page = () => {
     const words = [
@@ -24,6 +28,8 @@ const Page = () => {
             className: "text-blue-500 dark:text-blue-500",
         },
     ];
+
+
     return (
         <>
             <section className='cart-cta'>
@@ -34,11 +40,12 @@ const Page = () => {
                     <h3 className='text-lg text-slate-300'>
                         Get actionable feedback from AI to upgrade your interview game and land your dream role.
                     </h3>
-                    <Button asChild className='btn-primary max-sm:w-full'>
-                        <Link href="/interview">
-                            Start an Interview
-                        </Link>
-                    </Button>
+                    {/* <Button className='btn-primary max-sm:w-full' onClick={handleOnClick}> */}
+                        {/* <Link href="/interview"> */}
+                        {/* Start an Interview */}
+                        {/* </Link> */}
+                    {/* </Button> */}
+                    <ActionBtn />
                 </div>
                 {/* <TypewriterEffect words={words} />   */}
             </section>

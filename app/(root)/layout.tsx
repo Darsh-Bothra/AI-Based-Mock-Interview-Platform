@@ -1,11 +1,17 @@
 import Navbar from '@/components/NavBar'
-import React from 'react'
+// import { isAuthenticated } from '@/lib/action/auth.action'
+import { AuthProvider } from '@/context/AuthContext'
+import LoginModal from '@/components/Modal'
 
-const HomeLayout = ({ children }: { children: React.ReactNode }) => {
+const HomeLayout = async ({ children }: { children: React.ReactNode }) => {
+    // const isUserAuthenticated = await isAuthenticated();
     return (
         <div className='root-layout'>
-            <Navbar />
-            {children}
+            <AuthProvider>
+                <Navbar />
+                {children}
+                <LoginModal />
+            </AuthProvider>
         </div>
     )
 }
