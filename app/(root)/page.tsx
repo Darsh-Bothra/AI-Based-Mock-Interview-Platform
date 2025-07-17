@@ -1,15 +1,11 @@
-'use client';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { dummyInterviews } from '@/constants';
 import InterviewCard from '@/components/InterviewCard';
-// import { TypewriterEffect } from '@/components/ui/typewriter-effect';
-// import { isAuthenticated } from '@/lib/action/auth.action';
-// import Modal from '@/components/Modal';
-// import { useState } from 'react';
-// import { ActionBtn } from '@/components/ActionBtn';
+import { getCurrentUser, getInterviews, getInterviewsByUserId } from '@/lib/action/auth.action';
 
-const Page = () => {
+
+const Page = async () => {
     const words = [
         {
             text: "Build",
@@ -29,8 +25,15 @@ const Page = () => {
         },
     ];
 
-
-    return (
+    const user = await getCurrentUser();
+    // this allows to fetch request parallely
+    const [userInterviews, otherInterviews] = await Promise.all([
+        await getInterviewsByUserId(user?.id!),
+        await getInterviews({ userId: user?.id! })
+    ]);
+    const hasPastInterviews = userInterviews?.length > 0;
+    const hasUpcomingInterviews = otherInterviews?.length > 0;
+    return (   
         <>
             <section className='cart-cta'>
                 <div className='flex flex-col gap-6 max-w-lg mt-[150px]'>
@@ -52,17 +55,25 @@ const Page = () => {
             <section className='flex flex-col gap-6 mt-8'>
                 <h2>Your Interviews</h2>
                 <div className='flex flex-wrap gap-6'>
-                    {dummyInterviews.map((interview) => (
-                        <InterviewCard {...interview} key={interview.id} />
-                    ))}
+                    {
+                        hasPastInterviews ? (
+                            userInterviews?.map((interview: any) => (
+                                <InterviewCard {...interview} key={interview.id} />
+                            ))
+                        ) : (<p>You haven&apos;t taken any interviews yet</p>)
+                    }
                 </div>
             </section>
             <section className="flex flex-col gap-6 mt-8">
                 <h2>Take Interviews</h2>
                 <div className='flex flex-wrap gap-6'>
-                    {dummyInterviews.map((interview) => (
-                        <InterviewCard {...interview} key={interview.id} />
-                    ))}
+                    {
+                        hasUpcomingInterviews ? (
+                            otherInterviews?.map((interview: any) => (
+                                <InterviewCard {...interview} key={interview.id} />
+                            ))
+                        ) : (<p>No interviews available</p>)
+                    }
                 </div>
             </section>
         </>
