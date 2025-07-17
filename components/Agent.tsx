@@ -73,7 +73,8 @@ const Agent = ({ userName, userId, type }: AgentProps) => {
             await vapi.start(
                 undefined,
                 undefined,
-                undefined, process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
+                undefined, 
+                process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
                 variableValues: {
                     username: userName,
                     userid: userId,

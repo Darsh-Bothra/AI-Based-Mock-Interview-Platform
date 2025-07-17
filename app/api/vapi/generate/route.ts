@@ -12,8 +12,24 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-    const { type, role, level, techstack, amount, userid } = await req.json();
     try {
+        const body = await req.json();
+
+        console.log("Incoming body:", JSON.stringify(body, null, 2));
+
+        // Check if it's a tool call from assistant
+        const rawArgs = body?.message?.toolCallList?.[0]?.function?.arguments;
+
+        let type, role, level, techstack, amount, userid;
+
+        if (rawArgs) {
+            // If from assistant, parse the arguments
+            ({ type, role, level, techstack, amount, userid } = JSON.parse(rawArgs));
+        } else {
+            // Fallback: standard API request (e.g. from your own frontend or workflow)
+            ({ type, role, level, techstack, amount, userid } = body);
+        }
+
         const { text: questions } = await generateText({
             model: google('gemini-2.0-flash-001'),
             prompt: `Prepare questions for a job interview.
@@ -29,21 +45,25 @@ export async function POST(req: Request) {
                     
                     Thank you! <3`,
         });
+
         const interview = {
-            role:role, 
-            type: type, 
-            level: level,
+            role,
+            type,
+            level,
             techstack: techstack.split(","),
             questions: JSON.parse(questions),
             userId: userid,
             finalized: true,
             converImage: getRandomInterviewCover(),
             createdAt: new Date().toISOString()
-        }
+        };
+
         await db.collection("interviews").add(interview);
-        return Response.json({ success: true}, { status: 200 });
-    } catch (error) {
-        console.error(error);
-        return Response.json({ success: false, error }, { status: 500 });
+
+        return Response.json({ success: true }, { status: 200 });
+
+    } catch (error : any) {
+        console.error("Error in interview generation route:", error);
+        return Response.json({ success: false, error: error.message }, { status: 500 });
     }
 }
