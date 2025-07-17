@@ -60,7 +60,7 @@ export async function POST(req: Request) {
 
         await db.collection("interviews").add(interview);
 
-        return Response.json({ success: true }, { status: 200 });
+        return Response.json({ success: true, debug: body }, { status: 200 });
 
     } catch (error : any) {
         console.error("Error in interview generation route:", error);
