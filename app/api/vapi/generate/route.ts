@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     try {
         const body = await req.json();
 
-        console.log("Incoming body:", JSON.stringify(body, null, 2));
+        // console.log("Incoming body:", JSON.stringify(body, null, 2));
 
         // Check if it's a tool call from assistant
         const rawArgs = body?.message?.toolCallList?.[0]?.function?.arguments;

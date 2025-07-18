@@ -2,8 +2,9 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { dummyInterviews } from '@/constants';
 import InterviewCard from '@/components/InterviewCard';
-import { getCurrentUser, getInterviews, getInterviewsByUserId } from '@/lib/action/auth.action';
-
+import { getInterviews, getInterviewsByUserId } from '@/lib/action/general.action';
+import { getCurrentUser } from '@/lib/action/auth.action';
+import Navbar from "@/components/NavBar";
 
 const Page = async () => {
     const words = [
@@ -27,14 +28,19 @@ const Page = async () => {
 
     const user = await getCurrentUser();
     // this allows to fetch request parallely
+    console.log("Current User ID:", user?.id);
     const [userInterviews, otherInterviews] = await Promise.all([
         await getInterviewsByUserId(user?.id!),
         await getInterviews({ userId: user?.id! })
     ]);
     const hasPastInterviews = userInterviews?.length > 0;
     const hasUpcomingInterviews = otherInterviews?.length > 0;
-    return (   
+    console.log(userInterviews, otherInterviews);
+    return (
         <>
+
+            <Navbar />
+
             <section className='cart-cta'>
                 <div className='flex flex-col gap-6 max-w-lg mt-[150px]'>
                     <div className='text-5xl font-semibold text-purple-400'>
@@ -57,7 +63,7 @@ const Page = async () => {
                 <div className='flex flex-wrap gap-6'>
                     {
                         hasPastInterviews ? (
-                            userInterviews?.map((interview: any) => (
+                            userInterviews?.map((interview) => (
                                 <InterviewCard {...interview} key={interview.id} />
                             ))
                         ) : (<p>You haven&apos;t taken any interviews yet</p>)
@@ -69,7 +75,7 @@ const Page = async () => {
                 <div className='flex flex-wrap gap-6'>
                     {
                         hasUpcomingInterviews ? (
-                            otherInterviews?.map((interview: any) => (
+                            otherInterviews?.map((interview) => (
                                 <InterviewCard {...interview} key={interview.id} />
                             ))
                         ) : (<p>No interviews available</p>)
